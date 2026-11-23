@@ -23,3 +23,12 @@ if (typeof post.url !== 'string' || !/^https:\/\/(www\.|mobile\.)?(x|twitter)\.c
 
 mkdirSync(OUTPUT_DIR, { recursive: true });
 copyFileSync(join(BOT_DIR, 'POST.json'), join(OUTPUT_DIR, 'POST.json'));
+
+// Read the copy back and compare: the gate reads /output/POST.json, so a silent short write
+// would hand it a broken file. Verify the bytes match and say which post was handed in.
+const handed = readFileSync(join(OUTPUT_DIR, 'POST.json'), 'utf8');
+if (handed !== readFileSync(join(BOT_DIR, 'POST.json'), 'utf8')) {
+  console.error('POST.json copy does not match the repository file');
+  process.exit(1);
+}
+console.log(`handed in: ${post.url}`);
